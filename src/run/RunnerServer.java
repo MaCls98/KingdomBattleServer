@@ -12,7 +12,7 @@ public class RunnerServer {
 	public static void main(String[] args) {
 		try {
 			new ServerKingdomBattle(Integer.parseInt(JOptionPane.showInputDialog("IP Port")));
-		} catch (NumberFormatException | HeadlessException | IOException e) {
+		} catch (NumberFormatException | HeadlessException | IOException | InterruptedException e) {
 			JOptionPane.showMessageDialog(null, "Wrong IP Port / Cannot Start The Server", "Wrong IP Port", JOptionPane.WARNING_MESSAGE);
 			e.printStackTrace();
 		}

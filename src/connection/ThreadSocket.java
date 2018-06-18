@@ -2,28 +2,28 @@ package connection;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 
-public class ThreadSocket extends Thread {
+import model.Player;
+
+public class ThreadSocket extends Thread implements IObservable {
 
 	private Socket connection;
 	private DataInputStream inputStream;
 	private DataOutputStream outputStream;
 	private boolean stop;
 	// private ArrayList<String> players;
-	private ArrayList<String> players;
 	private ServerKingdomBattle server;
-	private ArrayList<ThreadSocket> sockets;
+	private Player clientPlayer;
+	private IObserver iObserver;
 
-	public ThreadSocket(Socket socket, ServerKingdomBattle server) throws IOException {
-		players = new ArrayList<>();
+	public ThreadSocket(Socket socket, ServerKingdomBattle server) throws IOException, InterruptedException {
 		this.connection = socket;
 		this.server = server;
 		inputStream = new DataInputStream(socket.getInputStream());
@@ -37,11 +37,15 @@ public class ThreadSocket extends Thread {
 			try {
 				String request = inputStream.readUTF();
 				if (request != null) {
-					manageRequest(request);
+					try {
+						manageRequest(request);
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(null, "Connection lost with " + connection.getInetAddress().getHostAddress(), "Connection Finished", JOptionPane.WARNING_MESSAGE);
+					}
 				}
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(null,
-						"Connection lost with " + connection.getInetAddress().getHostAddress(), "Connection Ended",
+						"Connection lost with " + connection.getInetAddress().getHostAddress(), "Connection Finished",
 						JOptionPane.WARNING_MESSAGE);
 				stop = true;
 			}
@@ -54,32 +58,40 @@ public class ThreadSocket extends Thread {
 		}
 	}
 
-	public void updatePlayer() throws IOException {
-		String player = inputStream.readUTF();
-		String tmpP[] = player.split(",");
-		if (players.size() == 0) {
-			players.add(player);
-		} else {
-			for (String string : players) {
-				String tmpL[] = string.split(",");
-				if (!tmpP[0].equals(tmpL[0])) {
-					players.add(player);
-				}
-			}
-		}
-		sendPlayers();
+	private void updatePlayer() throws IOException {
+		String strPlayer = inputStream.readUTF();
+		String[] tmpPlayer = strPlayer.split(",");
+		clientPlayer = new Player(tmpPlayer[0], Integer.parseInt(tmpPlayer[1]), Integer.parseInt(tmpPlayer[2]),
+				Integer.parseInt(tmpPlayer[3]),	Integer.parseInt(tmpPlayer[4]), Integer.parseInt(tmpPlayer[5]));
+		server.update();
 	}
 
-	public void sendPlayers() throws IOException {
+	public void sendPlayers(File players) throws IOException {
 		outputStream.writeUTF(REQUEST.SEND_PLAYERS.toString());
-		outputStream.writeInt(players.size());
-		for (String string : players) {
-			System.out.println(string);
-			outputStream.writeUTF(string);
+		outputStream.writeUTF(String.valueOf(players.length()));
+		FileInputStream inputStream = new FileInputStream(players);
+		byte[] buffer = new byte[4096];
+		while (inputStream.read(buffer) > 0) {
+			outputStream.write(buffer);
 		}
+		inputStream.close();
+	}
+
+	public Player getClientPlayer() {
+		return clientPlayer;
 	}
 
 	public boolean isStop() {
 		return stop;
+	}
+
+	@Override
+	public void addObserver(IObserver iObserver) {
+		this.iObserver = iObserver;
+	}
+
+	@Override
+	public void removeObserver() {
+		iObserver = null;
 	}
 }
