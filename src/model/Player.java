@@ -18,6 +18,10 @@ public class Player {
 		this.health = health;
 		this.attack = attack;
 	}
+	
+	public void calculateAttack(int damage){
+		health = health - damage;
+	}
 
 	public String getName() {
 		return name;

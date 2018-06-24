@@ -1,13 +1,14 @@
 package connection;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import model.GameManager;
 import model.Player;
+import model.Shoot;
 import persistence.JSonPlayer;
 
 public class ServerKingdomBattle extends Thread implements IObserver{
@@ -17,11 +18,11 @@ public class ServerKingdomBattle extends Thread implements IObserver{
 	private boolean stop;
 	public final static Logger LOGGER = Logger.getGlobal();
 	private ArrayList<ThreadSocket> connections;
-	private JSonPlayer jSonPlayer;
+	private GameManager manager;
 	
 	public ServerKingdomBattle(int port) throws IOException, InterruptedException {
+		manager = new GameManager();
 		connections = new ArrayList<>();
-		jSonPlayer = new JSonPlayer();
 		this.port = port;
 		server = new ServerSocket(port);
 		start();
@@ -47,20 +48,42 @@ public class ServerKingdomBattle extends Thread implements IObserver{
 	
 	
 	
-	private void updatePlayers() throws IOException {
+	private void updateGame() throws IOException {
+		ArrayList<Player> players = updatePlayers();
+		manager.setPlayers(players);
+		
+		updateShoots();
+		
+		if (!manager.isWorking()) {
+			sendPlayers(manager.getPlayers());
+			sendShoots(manager.getShoots());
+		}
+	}
+
+	public void updateShoots() {
+		for (ThreadSocket threadSocket : connections) {
+			if (threadSocket.getShoot() != null) {
+				manager.addShoot(threadSocket.getShoot());
+			}
+		}
+	}
+
+	public ArrayList<Player> updatePlayers() {
 		ArrayList<Player> players = new ArrayList<>();
 		for (ThreadSocket threadSocket : connections) {
 			if (threadSocket.getClientPlayer() != null) {
 				players.add(threadSocket.getClientPlayer());				
 			}
 		}
-		jSonPlayer.setPlayers(players);
-		jSonPlayer.writePlayersJSon();
-		File jsonPlayers = new File("./players.json");
+		return players;
+	}
+	
+	private void sendShoots(ArrayList<Shoot> shoots){
+	}
+
+	private void sendPlayers(ArrayList<Player> players) throws IOException {
 		for (ThreadSocket threadSocket : connections) {
-			if (threadSocket != null) {
-				threadSocket.sendPlayers(jsonPlayers);
-			}
+			threadSocket.sendPlayers(players);
 		}
 	}
 
@@ -75,7 +98,7 @@ public class ServerKingdomBattle extends Thread implements IObserver{
 	@Override
 	public void update() {
 		try {
-			updatePlayers();
+			updateGame();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

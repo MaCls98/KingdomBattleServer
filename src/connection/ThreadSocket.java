@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import model.Player;
+import model.Shoot;
 
 public class ThreadSocket extends Thread implements IObservable {
 
@@ -21,6 +22,7 @@ public class ThreadSocket extends Thread implements IObservable {
 	// private ArrayList<String> players;
 	private ServerKingdomBattle server;
 	private Player clientPlayer;
+	private Shoot shoot;
 	private IObserver iObserver;
 
 	public ThreadSocket(Socket socket, ServerKingdomBattle server) throws IOException, InterruptedException {
@@ -40,13 +42,13 @@ public class ThreadSocket extends Thread implements IObservable {
 					try {
 						manageRequest(request);
 					} catch (Exception e) {
-						JOptionPane.showMessageDialog(null, "Connection lost with " + connection.getInetAddress().getHostAddress(), "Connection Finished", JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(null,
+								"Connection lost with " + connection.getInetAddress().getHostAddress(),
+								"Connection Finished", JOptionPane.WARNING_MESSAGE);
 					}
 				}
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(null,
-						"Connection lost with " + connection.getInetAddress().getHostAddress(), "Connection Finished",
-						JOptionPane.WARNING_MESSAGE);
+				e.printStackTrace();
 				stop = true;
 			}
 		}
@@ -55,6 +57,21 @@ public class ThreadSocket extends Thread implements IObservable {
 	public void manageRequest(String request) throws IOException {
 		if (request.equals(REQUEST.SEND_PLAYERS.toString())) {
 			updatePlayer();
+		}else if (request.equals(REQUEST.SEND_SHOOTS.toString())) {
+			updateShoots();
+		}
+	}
+
+	private void updateShoots() throws IOException {
+		String strShoot = inputStream.readUTF();
+		String[] tmpShoot = strShoot.split(",");
+		shoot = new Shoot(Integer.parseInt(tmpShoot[0]), Integer.parseInt(tmpShoot[1]), Integer.parseInt(tmpShoot[2]), 
+				Integer.parseInt(tmpShoot[3]), new Boolean(tmpShoot[4]));
+		server.update();
+		try {
+			shoot = null;
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 	}
 
@@ -62,23 +79,43 @@ public class ThreadSocket extends Thread implements IObservable {
 		String strPlayer = inputStream.readUTF();
 		String[] tmpPlayer = strPlayer.split(",");
 		clientPlayer = new Player(tmpPlayer[0], Integer.parseInt(tmpPlayer[1]), Integer.parseInt(tmpPlayer[2]),
-				Integer.parseInt(tmpPlayer[3]),	Integer.parseInt(tmpPlayer[4]), Integer.parseInt(tmpPlayer[5]));
+				Integer.parseInt(tmpPlayer[3]), Integer.parseInt(tmpPlayer[4]), Integer.parseInt(tmpPlayer[5]));
 		server.update();
 	}
 
-	public void sendPlayers(File players) throws IOException {
-		outputStream.writeUTF(REQUEST.SEND_PLAYERS.toString());
-		outputStream.writeUTF(String.valueOf(players.length()));
-		FileInputStream inputStream = new FileInputStream(players);
-		byte[] buffer = new byte[4096];
-		while (inputStream.read(buffer) > 0) {
-			outputStream.write(buffer);
+	public void sendPlayers(ArrayList<Player> players) throws IOException {
+		// outputStream.writeUTF(REQUEST.SEND_PLAYERS.toString());
+		// outputStream.writeUTF(String.valueOf(players.length()));
+		// FileInputStream inputStream = new FileInputStream(players);
+		// byte[] buffer = new byte[4096];
+		// while (inputStream.read(buffer) > 0) {
+		// outputStream.write(buffer);
+		// }
+		// inputStream.close();
+		try {
+			String playersStr = "";
+			for (Player player : players) {
+				playersStr = playersStr + player.toString() + ":";
+			}
+			outputStream.writeUTF(REQUEST.UPDATE_PLAYER.toString());
+			outputStream.writeUTF(playersStr);
+			outputStream.flush();
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
-		inputStream.close();
+	}
+
+	public void sendWaitRequest() throws IOException {
+		outputStream.writeUTF(REQUEST.WAIT_PLAYERS.toString());
+		outputStream.flush();
 	}
 
 	public Player getClientPlayer() {
 		return clientPlayer;
+	}
+	
+	public Shoot getShoot() {
+		return shoot;
 	}
 
 	public boolean isStop() {
