@@ -6,9 +6,9 @@ public class Player {
 	private int xAxis;
 	private int yAxis;
 	private int direction;
-	private static int health;
+	private int health;
 	private int attack;
-	private int contacts;
+	private boolean isAlive;
 
 	public Player(String name, int xAxis, int yAxis, int direction, int health, int attack) {
 		super();
@@ -16,17 +16,9 @@ public class Player {
 		this.xAxis = xAxis;
 		this.yAxis = yAxis;
 		this.direction = direction;
-		Player.health = health;
+		this.health = health;
 		this.attack = attack;
-		contacts = 0;
-	}
-	
-	public int getContacts() {
-		return contacts;
-	}
-	
-	public void setContacts(int contacts) {
-		contacts = contacts + 1;
+		isAlive = true;
 	}
 	
 	public void calculateAttack(int damage){
@@ -56,9 +48,17 @@ public class Player {
 	public int getAttack() {
 		return attack;
 	}
+	
+	public boolean isAlive() {
+		return isAlive;
+	}
+
+	public void setAlive(boolean isAlive) {
+		this.isAlive = isAlive;
+	}
 
 	@Override
 	public String toString() {
-		return name + "," + direction + "," + xAxis + "," + yAxis + "," + health + "," + attack;
+		return name + "," + direction + "," + xAxis + "," + yAxis + "," + health + "," + attack + "," + isAlive;
 	}
 }

@@ -2,13 +2,10 @@ package connection;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
 
 import model.Player;
 import model.Shoot;
@@ -23,7 +20,6 @@ public class ThreadSocket extends Thread implements IObservable {
 	private ServerKingdomBattle server;
 	private Player clientPlayer;
 	private Shoot shoot;
-	private IObserver iObserver;
 
 	public ThreadSocket(Socket socket, ServerKingdomBattle server) throws IOException, InterruptedException {
 		this.connection = socket;
@@ -42,13 +38,11 @@ public class ThreadSocket extends Thread implements IObservable {
 					try {
 						manageRequest(request);
 					} catch (Exception e) {
-						JOptionPane.showMessageDialog(null,
-								"Connection lost with " + connection.getInetAddress().getHostAddress(),
-								"Connection Finished", JOptionPane.WARNING_MESSAGE);
+						
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				server.updateConsole("Connection lost with " + connection.getInetAddress().getHostAddress());
 				stop = true;
 			}
 		}
@@ -98,14 +92,6 @@ public class ThreadSocket extends Thread implements IObservable {
 	}
 
 	public void sendPlayers(ArrayList<Player> players) throws IOException {
-		// outputStream.writeUTF(REQUEST.SEND_PLAYERS.toString());
-		// outputStream.writeUTF(String.valueOf(players.length()));
-		// FileInputStream inputStream = new FileInputStream(players);
-		// byte[] buffer = new byte[4096];
-		// while (inputStream.read(buffer) > 0) {
-		// outputStream.write(buffer);
-		// }
-		// inputStream.close();
 		try {
 			String playersStr = "";
 			for (Player player : players) {
@@ -138,13 +124,9 @@ public class ThreadSocket extends Thread implements IObservable {
 
 	@Override
 	public void addObserver(IObserver iObserver) {
-		this.iObserver = iObserver;
 	}
 
 	@Override
 	public void removeObserver() {
-		iObserver = null;
 	}
-
-	
 }

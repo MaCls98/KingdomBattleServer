@@ -6,7 +6,7 @@ public class Shoot {
 	private int direction;
 	private int x;
 	private int y;
-	private static int move = 10;
+	private static int move = 5;
 	private boolean isActive;
 
 	public Shoot(int x, int y, int damage, int direction, boolean isActive) {
@@ -42,7 +42,7 @@ public class Shoot {
 	
 	public boolean validateImpact(Player player){
 		move();
-		if (Math.abs(getX() - player.getxAxis()) < 10 && Math.abs(getY() - player.getyAxis()) < 10) {
+		if (Math.abs(getX() - player.getxAxis()) < 18 && Math.abs(getY() - player.getyAxis()) < 18) {
 			return true;
 		}
 		return false;

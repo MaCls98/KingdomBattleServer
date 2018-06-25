@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import model.GameManager;
 import model.Player;
 import model.Shoot;
-import persistence.JSonPlayer;
+import views.MainWindow;
 
 public class ServerKingdomBattle extends Thread implements IObserver {
 
@@ -18,15 +18,20 @@ public class ServerKingdomBattle extends Thread implements IObserver {
 	private boolean stop;
 	public final static Logger LOGGER = Logger.getGlobal();
 	private ArrayList<ThreadSocket> connections;
+	private ArrayList<String> consoleLog;
 	private GameManager manager;
+	private MainWindow window;
 
 	public ServerKingdomBattle(int port) throws IOException, InterruptedException {
+		window = new MainWindow();
+		consoleLog = new ArrayList<>();
 		manager = new GameManager();
 		connections = new ArrayList<>();
 		this.port = port;
 		server = new ServerSocket(port);
 		start();
-		System.out.println("Servidor Iniciado en puerto " + this.port);
+		consoleLog.add("Server started at port: " + this.port);
+		window.setConsole(consoleLog);
 	}
 
 	@Override
@@ -38,22 +43,31 @@ public class ServerKingdomBattle extends Thread implements IObserver {
 				connection = server.accept();
 				socket = new ThreadSocket(connection, this);
 				connections.add(socket);
-				System.out.println("Conexion Aceptada: " + connection.getInetAddress().getHostAddress());
+				consoleLog.add("Conexion Aceptada: " + connection.getInetAddress().getHostAddress());
+				window.setConsole(consoleLog);
 			} catch (IOException | InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				
 			}
 		}
+	}
+	
+	public void updateConsole(String string){
+		consoleLog.add(string);
+		window.setConsole(consoleLog);
 	}
 
 	private void updateGame() throws IOException {
 		ArrayList<Player> players = updatePlayers();
-		manager.setPlayers(players);
+		if (players.size() == 4) {
+			manager.setPlayers(players);
 
-		updateShoots();
+			updateShoots();
 
-		sendPlayers(manager.getPlayers());
-		sendShoots(manager.getShoots());
+			sendPlayers(manager.getPlayers());
+			sendShoots(manager.getShoots());
+		}else {
+			System.out.println("Esperando jugadores");
+		}
 	}
 
 	public void updateShoots() {

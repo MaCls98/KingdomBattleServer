@@ -21,12 +21,15 @@ public class GameManager {
 	}
 
 	private void moveShoots() {
+		ArrayList<Player> ps = players;
 		if (shoots.size() > 0) {
 			for (Shoot shoot : shoots) {
-				for (Player player : players) {
-					if (shoot.validateImpact(player)) {
-						shoot.setActive(false);
-						player.setContacts(1);
+				for (Player player : ps) {
+					if (shoot.isActive()) {
+						if (shoot.validateImpact(player)) {
+							player.calculateAttack(shoot.getDamage());
+							shoot.setActive(false);
+						}
 					}
 				}
 			}
