@@ -26,9 +26,9 @@ public class GameManager {
 			for (Shoot shoot : shoots) {
 				for (Player player : ps) {
 					if (shoot.isActive()) {
-						if (player.isAlive()) {
-							if (!shoot.getName().equals(player.getName())) {
-								if (shoot.validateImpact(player)) {
+						if (!shoot.getName().equals(player.getName())) {
+							if (shoot.validateImpact(player)) {
+								if (player.isAlive()) {
 									player.calculateAttack(shoot.getDamage());
 									shoot.setActive(false);
 								}

@@ -58,7 +58,7 @@ public class ServerKingdomBattle extends Thread implements IObserver {
 
 	private void updateGame() throws IOException {
 		ArrayList<Player> players = updatePlayers();
-		if (players.size() == 4) {
+		if (players.size() == 2) {
 			manager.setPlayers(players);
 
 			updateShoots();
