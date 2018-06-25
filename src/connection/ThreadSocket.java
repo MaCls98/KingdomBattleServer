@@ -82,6 +82,20 @@ public class ThreadSocket extends Thread implements IObservable {
 				Integer.parseInt(tmpPlayer[3]), Integer.parseInt(tmpPlayer[4]), Integer.parseInt(tmpPlayer[5]));
 		server.update();
 	}
+	
+	public void sendShoots(ArrayList<Shoot> shoots) {
+		try {
+			String shootsStr = "";
+			for (Shoot shoot : shoots) {
+				shootsStr = shootsStr + shoot.toString() + ":";
+			}
+			outputStream.writeUTF(REQUEST.UPDATE_SHOOTS.toString());
+			outputStream.writeUTF(shootsStr);
+			outputStream.flush();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
 
 	public void sendPlayers(ArrayList<Player> players) throws IOException {
 		// outputStream.writeUTF(REQUEST.SEND_PLAYERS.toString());
@@ -131,4 +145,6 @@ public class ThreadSocket extends Thread implements IObservable {
 	public void removeObserver() {
 		iObserver = null;
 	}
+
+	
 }

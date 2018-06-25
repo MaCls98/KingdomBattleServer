@@ -18,6 +18,7 @@ public class Shoot {
 	}
 	
 	public void move(){
+		calculateScreen();
 		if (isActive) {
 			switch (direction) {
 			case 1:
@@ -36,6 +37,20 @@ public class Shoot {
 			default:
 				break;
 			}
+		}
+	}
+	
+	public boolean validateImpact(Player player){
+		move();
+		if (Math.abs(getX() - player.getxAxis()) < 10 && Math.abs(getY() - player.getyAxis()) < 10) {
+			return true;
+		}
+		return false;
+	}
+	
+	private void calculateScreen(){
+		if (x > 850 || y > 650) {
+			isActive = false;
 		}
 	}
 

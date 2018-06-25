@@ -11,15 +11,15 @@ import model.Player;
 import model.Shoot;
 import persistence.JSonPlayer;
 
-public class ServerKingdomBattle extends Thread implements IObserver{
-	
-	private ServerSocket server;	
+public class ServerKingdomBattle extends Thread implements IObserver {
+
+	private ServerSocket server;
 	private int port;
 	private boolean stop;
 	public final static Logger LOGGER = Logger.getGlobal();
 	private ArrayList<ThreadSocket> connections;
 	private GameManager manager;
-	
+
 	public ServerKingdomBattle(int port) throws IOException, InterruptedException {
 		manager = new GameManager();
 		connections = new ArrayList<>();
@@ -28,7 +28,7 @@ public class ServerKingdomBattle extends Thread implements IObserver{
 		start();
 		System.out.println("Servidor Iniciado en puerto " + this.port);
 	}
-	
+
 	@Override
 	public void run() {
 		ThreadSocket socket;
@@ -45,19 +45,15 @@ public class ServerKingdomBattle extends Thread implements IObserver{
 			}
 		}
 	}
-	
-	
-	
+
 	private void updateGame() throws IOException {
 		ArrayList<Player> players = updatePlayers();
 		manager.setPlayers(players);
-		
+
 		updateShoots();
-		
-		if (!manager.isWorking()) {
-			sendPlayers(manager.getPlayers());
-			sendShoots(manager.getShoots());
-		}
+
+		sendPlayers(manager.getPlayers());
+		sendShoots(manager.getShoots());
 	}
 
 	public void updateShoots() {
@@ -66,19 +62,23 @@ public class ServerKingdomBattle extends Thread implements IObserver{
 				manager.addShoot(threadSocket.getShoot());
 			}
 		}
+		manager.validateGame();
 	}
 
 	public ArrayList<Player> updatePlayers() {
 		ArrayList<Player> players = new ArrayList<>();
 		for (ThreadSocket threadSocket : connections) {
 			if (threadSocket.getClientPlayer() != null) {
-				players.add(threadSocket.getClientPlayer());				
+				players.add(threadSocket.getClientPlayer());
 			}
 		}
 		return players;
 	}
-	
-	private void sendShoots(ArrayList<Shoot> shoots){
+
+	private void sendShoots(ArrayList<Shoot> shoots) {
+		for (ThreadSocket threadSocket : connections) {
+			threadSocket.sendShoots(shoots);
+		}
 	}
 
 	private void sendPlayers(ArrayList<Player> players) throws IOException {
@@ -90,7 +90,7 @@ public class ServerKingdomBattle extends Thread implements IObserver{
 	public ArrayList<ThreadSocket> getConnections() {
 		return connections;
 	}
-	
+
 	public int getPort() {
 		return port;
 	}

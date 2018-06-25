@@ -6,8 +6,9 @@ public class Player {
 	private int xAxis;
 	private int yAxis;
 	private int direction;
-	private int health;
+	private static int health;
 	private int attack;
+	private int contacts;
 
 	public Player(String name, int xAxis, int yAxis, int direction, int health, int attack) {
 		super();
@@ -15,8 +16,17 @@ public class Player {
 		this.xAxis = xAxis;
 		this.yAxis = yAxis;
 		this.direction = direction;
-		this.health = health;
+		Player.health = health;
 		this.attack = attack;
+		contacts = 0;
+	}
+	
+	public int getContacts() {
+		return contacts;
+	}
+	
+	public void setContacts(int contacts) {
+		contacts = contacts + 1;
 	}
 	
 	public void calculateAttack(int damage){
