@@ -7,7 +7,7 @@ public class Shoot {
 	private int direction;
 	private int x;
 	private int y;
-	private static int move = 30;
+	private static int move = 10;
 	private boolean isActive;
 
 	public Shoot(int x, int y, int damage, int direction, boolean isActive, String name) {

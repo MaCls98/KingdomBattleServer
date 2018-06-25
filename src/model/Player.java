@@ -9,6 +9,7 @@ public class Player {
 	private int health;
 	private int attack;
 	private boolean isAlive;
+	private boolean isWinner;
 
 	public Player(String name, int xAxis, int yAxis, int direction, int health, int attack) {
 		super();
@@ -19,6 +20,7 @@ public class Player {
 		this.health = health;
 		this.attack = attack;
 		isAlive = true;
+		isWinner = false;
 	}
 	
 	public void calculateAttack(int damage){
@@ -56,9 +58,13 @@ public class Player {
 	public void setAlive(boolean isAlive) {
 		this.isAlive = isAlive;
 	}
+	
+	public void setWinner(boolean isWinner) {
+		this.isWinner = isWinner;
+	}
 
 	@Override
 	public String toString() {
-		return name + "," + direction + "," + xAxis + "," + yAxis + "," + health + "," + attack + "," + isAlive;
+		return name + "," + direction + "," + xAxis + "," + yAxis + "," + health + "," + attack + "," + isAlive + "," + isWinner;
 	}
 }

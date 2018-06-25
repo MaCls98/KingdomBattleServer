@@ -18,6 +18,24 @@ public class GameManager {
 
 	public void validateGame() {
 		moveShoots();
+		checkWinner();
+	}
+
+	private void checkWinner() {
+		ArrayList<Player> ps = players;
+		int i = 0;
+		for (Player player : ps) {
+			if (!player.isAlive()) {
+				i++;
+			}
+		}
+		if (i == 1) {
+			for (Player player : players) {
+				if (player.isAlive()) {
+					player.setWinner(true);
+				}
+			}
+		}
 	}
 
 	private void moveShoots() {
