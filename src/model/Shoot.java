@@ -2,6 +2,7 @@ package model;
 
 public class Shoot {
 	
+	private String name;
 	private int damage;
 	private int direction;
 	private int x;
@@ -9,12 +10,13 @@ public class Shoot {
 	private static int move = 5;
 	private boolean isActive;
 
-	public Shoot(int x, int y, int damage, int direction, boolean isActive) {
+	public Shoot(int x, int y, int damage, int direction, boolean isActive, String name) {
 		this.damage = damage;
 		this.direction = direction;
 		this.x = x;
 		this.y = y;
 		this.isActive = true;
+		this.name = name;
 	}
 	
 	public void move(){
@@ -42,7 +44,7 @@ public class Shoot {
 	
 	public boolean validateImpact(Player player){
 		move();
-		if (Math.abs(getX() - player.getxAxis()) < 18 && Math.abs(getY() - player.getyAxis()) < 18) {
+		if (Math.abs(getX() - player.getxAxis()) < 32 && Math.abs(getY() - player.getyAxis()) < 32) {
 			return true;
 		}
 		return false;
@@ -77,6 +79,10 @@ public class Shoot {
 	private void moveRight() {
 		x = x + move;
 	}
+	
+	public String getName() {
+		return name;
+	}
 
 	public int getDamage() {
 		return damage;
@@ -104,6 +110,6 @@ public class Shoot {
 
 	@Override
 	public String toString() {
-		return x + "," + y + "," + damage + "," + direction + "," + isActive;
+		return x + "," + y + "," + damage + "," + direction + "," + isActive + "," + name;
 	}
 }

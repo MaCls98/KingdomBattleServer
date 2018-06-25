@@ -60,7 +60,7 @@ public class ThreadSocket extends Thread implements IObservable {
 		String strShoot = inputStream.readUTF();
 		String[] tmpShoot = strShoot.split(",");
 		shoot = new Shoot(Integer.parseInt(tmpShoot[0]), Integer.parseInt(tmpShoot[1]), Integer.parseInt(tmpShoot[2]), 
-				Integer.parseInt(tmpShoot[3]), new Boolean(tmpShoot[4]));
+				Integer.parseInt(tmpShoot[3]), new Boolean(tmpShoot[4]), tmpShoot[5]);
 		server.update();
 		try {
 			shoot = null;

@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -18,10 +19,11 @@ public class MainWindow extends JFrame{
 	private JTextArea console;
 	
 	public MainWindow() {
-		setTitle("BK Server Console");
+		setTitle("B-K Server Console");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setExtendedState(MAXIMIZED_BOTH);
 		setLayout(new BorderLayout());
+		setIconImage(new ImageIcon(getClass().getResource("/img/icon.png")).getImage());
 		
 		console = new JTextArea();
 		console.setEditable(false);

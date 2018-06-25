@@ -66,7 +66,9 @@ public class ServerKingdomBattle extends Thread implements IObserver {
 			sendPlayers(manager.getPlayers());
 			sendShoots(manager.getShoots());
 		}else {
-			System.out.println("Esperando jugadores");
+			for (ThreadSocket threadSocket : connections) {
+				threadSocket.sendWaitRequest();
+			}
 		}
 	}
 
